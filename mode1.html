@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scramble Royale - Team Battle</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Bubblegum+Sans&display=swap" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Bubblegum Sans', cursive;
+            background: linear-gradient(135deg, #1A3A5F, #0F2A44); /* Navy blue theme */
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 20px 20px 0;
+            overflow: auto;
+        }
+
+        /* ================= TIMER BAR ================= */
+        .timer-container {
+            position: fixed;
+            right: 0;
+            top: 0;
+            height: 100vh;
+            width: 18px;
+            background: rgba(0,0,0,0.15);
+            z-index: 100;
+        }
+
+        .timer-bar {
+            width: 100%;
+            height: 0%;
+            background: #4ECDC4;
+            position: absolute;
+            top: 0;
+            left: 0;
+            animation: countdown 600s linear forwards;
+            box-shadow: 0 0 15px #4ECDC4;
+        }
+
+        @keyframes countdown {
+            from { height: 0%; }
+            to { height: 100%; }
+        }
+
+        /* ================= MAIN CARD ================= */
+        .question-container {
+            background: white;
+            border-radius: 30px;
+            padding: 40px;
+            max-width: 1200px;
+            width: 95%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            margin: 20px auto;
+            max-height: 90vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            border: 3px solid #FFD700;
+        }
+
+        .question-container::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        .question-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .question-container::-webkit-scrollbar-thumb {
+            background: #1A3A5F;
+            border-radius: 10px;
+        }
+
+        .stage-title {
+            font-family: 'Fredoka One', cursive;
+            font-size: 48px;
+            color: #1A3A5F;
+            margin-bottom: 5px;
+            flex-shrink: 0;
+            text-shadow: 2px 2px 0 #FFD700;
+        }
+
+        .level-badge {
+            font-size: 24px;
+            color: #666;
+            margin-bottom: 15px;
+            flex-shrink: 0;
+            background: #f0f0f0;
+            display: inline-block;
+            padding: 8px 30px;
+            border-radius: 50px;
+            margin-top: 5px;
+        }
+
+        .level-badge span {
+            font-weight: bold;
+            color: #1A3A5F;
+        }
+
+        .question-number {
+            font-family: 'Fredoka One', cursive;
+            font-size: 32px;
+            color: #4ECDC4;
+            margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+
+        .question-box {
+            background: linear-gradient(135deg, #1A3A5F, #2B4F7C);
+            border-radius: 25px;
+            padding: 50px;
+            color: white;
+            margin-bottom: 30px;
+            flex-shrink: 0;
+            border: 3px solid #FFD700;
+            box-shadow: inset 0 -5px 0 rgba(0,0,0,0.2);
+        }
+
+        .scrambled-label {
+            font-family: 'Fredoka One', cursive;
+            font-size: 28px;
+            color: #FFD700;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .scrambled-sentence {
+            font-size: 48px;
+            margin-bottom: 25px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            font-weight: bold;
+            text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+
+        .answer-section {
+            background: #f8f9fa;
+            border-radius: 25px;
+            padding: 30px;
+            margin-bottom: 30px;
+            display: none;
+            max-height: 400px;
+            overflow-y: auto;
+            flex-shrink: 0;
+            border: 3px solid #4ECDC4;
+        }
+
+        .answer-section::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .answer-section::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .answer-section::-webkit-scrollbar-thumb {
+            background: #4ECDC4;
+            border-radius: 10px;
+        }
+
+        .answer-label {
+            font-family: 'Fredoka One', cursive;
+            font-size: 32px;
+            color: #4ECDC4;
+            margin-bottom: 20px;
+        }
+
+        .answer-text {
+            font-size: 42px;
+            color: #1A3A5F;
+            padding: 25px;
+            background: white;
+            border-radius: 15px;
+            border: 4px solid #4ECDC4;
+            word-wrap: break-word;
+            font-weight: bold;
+        }
+
+        .team-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(145deg, #FFD700, #FDB931);
+            border-radius: 20px;
+            color: #1A3A5F;
+            font-weight: bold;
+        }
+
+        .team-stat {
+            font-size: 24px;
+        }
+
+        .team-stat span {
+            font-size: 36px;
+            margin-right: 10px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 15px;
+            padding: 20px 0 10px 0;
+            background: white;
+            border-top: 3px solid #f0f0f0;
+            flex-shrink: 0;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+        }
+
+        .control-btn {
+            font-family: 'Fredoka One', cursive;
+            font-size: 28px;
+            padding: 20px 45px;
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+            color: white;
+            text-transform: uppercase;
+            box-shadow: 0 8px 0 rgba(0,0,0,0.2);
+            transition: all 0.1s ease;
+            min-width: 200px;
+        }
+
+        .control-btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 3px 0 rgba(0,0,0,0.2);
+        }
+
+        .btn-show { 
+            background: #4ECDC4; 
+            box-shadow: 0 8px 0 #2A8F87;
+        }
+        .btn-next { 
+            background: #FFD700; 
+            color: #333;
+            box-shadow: 0 8px 0 #C4A000;
+        }
+        .btn-home { 
+            background: #95a5a6; 
+            box-shadow: 0 8px 0 #6C7A7D;
+        }
+
+        .hidden { display: none !important; }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 50px;
+            border-radius: 50px;
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            animation: modalPop 0.5s ease-out;
+            border: 5px solid #FFD700;
+        }
+
+        @keyframes modalPop {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-icon {
+            font-size: 100px;
+            margin-bottom: 25px;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
+        }
+
+        .modal-content h2 {
+            font-family: 'Fredoka One', cursive;
+            font-size: 56px;
+            color: #1A3A5F;
+            margin-bottom: 25px;
+        }
+
+        .modal-content p {
+            font-size: 28px;
+            margin-bottom: 35px;
+            color: #333;
+        }
+
+        .modal-btn {
+            font-family: 'Fredoka One', cursive;
+            font-size: 28px;
+            padding: 18px 60px;
+            background: linear-gradient(145deg, #1A3A5F, #0F2A44);
+            border: none;
+            border-radius: 60px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 0 #0A1A2F;
+        }
+
+        .modal-btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 3px 0 #0A1A2F;
+        }
+
+        @media (max-width: 1024px) and (min-width: 768px) {
+            .stage-title {
+                font-size: 42px;
+            }
+            
+            .scrambled-sentence {
+                font-size: 42px;
+            }
+            
+            .answer-text {
+                font-size: 38px;
+            }
+            
+            .control-btn {
+                font-size: 24px;
+                padding: 16px 35px;
+                min-width: 180px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .stage-title {
+                font-size: 36px;
+            }
+            
+            .scrambled-sentence { 
+                font-size: 32px; 
+            }
+            
+            .answer-text {
+                font-size: 28px;
+            }
+            
+            .control-btn {
+                font-size: 22px;
+                padding: 15px 30px;
+                min-width: 160px;
+            }
+            
+            .question-box {
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="timer-container">
+    <div class="timer-bar"></div>
+</div>
+
+<div class="question-container">
+    <h1 class="stage-title">🎯 TEAM BATTLE</h1>
+    <div class="level-badge" id="levelDisplay">Loading level...</div>
+
+    <div class="question-number" id="questionNumber"></div>
+
+    <div class="question-box">
+        <div class="scrambled-label">🔀 SCRAMBLED SENTENCE</div>
+        <div class="scrambled-sentence" id="scrambledSentence">Loading questions...</div>
+    </div>
+
+    <div class="team-stats" id="teamStats">
+        <div class="team-stat"><span>🔴</span> 0</div>
+        <div class="team-stat"><span>🔵</span> 0</div>
+        <div class="team-stat"><span>🟢</span> 0</div>
+        <div class="team-stat"><span>🟡</span> 0</div>
+    </div>
+
+    <div class="answer-section" id="answerSection">
+        <div class="answer-label">✓ CORRECT ANSWER</div>
+        <div class="answer-text" id="answerText"></div>
+    </div>
+
+    <div class="controls">
+        <button class="control-btn btn-show" id="showAnswerBtn">Show Answer</button>
+        <button class="control-btn btn-next hidden" id="nextBtn">Next ➤</button>
+        <button class="control-btn btn-home" onclick="location.href='index.html'">Home</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="timesUpModal">
+    <div class="modal-content">
+        <div class="modal-icon">⏰</div>
+        <h2>TIME'S UP!</h2>
+        <p>The team battle has ended</p>
+        <button class="modal-btn" id="modalOkBtn">OK</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="completeModal">
+    <div class="modal-content">
+        <div class="modal-icon">🏆</div>
+        <h2>BATTLE COMPLETE!</h2>
+        <p>Great job, teams!</p>
+        <button class="modal-btn" id="completeOkBtn">OK</button>
+    </div>
+</div>
+
+<script>
+let questions = [];
+let currentIndex = 0;
+let timerTimeout;
+let teamScores = [0, 0, 0, 0];
+let currentLevel = 'beginner';
+let levelDisplay = {
+    beginner: '🌟 BEGINNER',
+    intermediate: '📚 INTERMEDIATE',
+    advanced: '⚡ ADVANCED'
+};
+
+$(document).ready(function () {
+    // Get the selected level from localStorage
+    const selectedLevel = localStorage.getItem('scrambleRoyaleLevel') || 'beginner';
+    currentLevel = selectedLevel;
+    
+    // Get the CSV file for this level
+    const csvFiles = {
+        beginner: 'beginner_week1.csv',
+        intermediate: 'intermediate_week1.csv',
+        advanced: 'advanced_week1.csv'
+    };
+    
+    const selectedCsvFile = csvFiles[selectedLevel];
+    
+    if (!selectedCsvFile) {
+        alert('No level selected. Please go back and choose a level.');
+        window.location.href = 'index.html';
+        return;
+    }
+    
+    // Display the level
+    $('#levelDisplay').html(`Level: <span>${levelDisplay[selectedLevel]}</span>`);
+    
+    console.log('Loading CSV file:', selectedCsvFile);
+    
+    const url = selectedCsvFile + '?t=' + new Date().getTime();
+    
+    // Use PapaParse to handle CSV properly
+    Papa.parse(url, {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+            console.log('PapaParse results:', results);
+            
+            if (results.errors.length > 0) {
+                console.warn('Parse errors:', results.errors);
+            }
+            
+            if (results.data && results.data.length > 0) {
+                // Map the CSV columns to our format
+                // Expected columns: #, scrambled sentence, correct sentence
+                questions = results.data
+                    .filter(row => row['scrambled sentence'] && row['correct sentence'])
+                    .map(row => ({
+                        scrambled: row['scrambled sentence'].trim(),
+                        correct: row['correct sentence'].trim()
+                    }));
+                
+                console.log('Questions loaded:', questions.length);
+                
+                if (questions.length === 0) {
+                    alert('No valid questions found. Using sample data.');
+                    loadSampleData();
+                } else {
+                    // Shuffle questions
+                    questions.sort(() => Math.random() - 0.5);
+                    showQuestion();
+                    
+                    // Start timer (10 minutes = 600000ms)
+                    timerTimeout = setTimeout(function() {
+                        showTimesUpModal();
+                    }, 600000);
+                    
+                    $('.timer-bar').on('animationend', function() {
+                        showTimesUpModal();
+                    });
+                }
+            } else {
+                console.warn('No data in CSV, loading sample data');
+                loadSampleData();
+            }
+        },
+        error: function(error) {
+            console.error('Error loading CSV:', error);
+            alert('Could not load CSV file. Using sample data instead.');
+            loadSampleData();
+        }
+    });
+});
+
+function loadSampleData() {
+    // Sample data based on your Sentences.xls structure
+    questions = [
+        { scrambled: 'like / I / pizza /', correct: 'I like pizza' },
+        { scrambled: 'cat / black / is / the /', correct: 'The cat is black' },
+        { scrambled: 'name / my / Minho / is /', correct: 'My name is Minho' },
+        { scrambled: 'go / I / to / school /', correct: 'I go to school' },
+        { scrambled: 'old / how / you / are /', correct: 'How old are you' },
+        { scrambled: 'playing / soccer / she / is /', correct: 'She is playing soccer' },
+        { scrambled: 'school / every / go / we / day / to /', correct: 'We go to school every day' },
+        { scrambled: 'time / do / wake / up / what / you /', correct: 'What time do you wake up' },
+        { scrambled: 'spinach / like / he / doesnt /', correct: 'He doesn\'t like spinach' },
+        { scrambled: 'homework / finished / have / your / you /', correct: 'Have you finished your homework' }
+    ];
+    
+    // Shuffle
+    questions.sort(() => Math.random() - 0.5);
+    
+    showQuestion();
+    
+    // Start timer
+    timerTimeout = setTimeout(function() {
+        showTimesUpModal();
+    }, 600000);
+    
+    $('.timer-bar').on('animationend', function() {
+        showTimesUpModal();
+    });
+}
+
+function showQuestion() {
+    if (currentIndex >= questions.length) {
+        clearTimeout(timerTimeout);
+        showCompleteModal();
+        return;
+    }
+
+    const q = questions[currentIndex];
+
+    $('#questionNumber').text(`Question ${currentIndex + 1} of ${questions.length}`);
+    $('#scrambledSentence').text(q.scrambled);
+    $('#answerText').text(q.correct);
+
+    // Hide answer section and reset buttons
+    $('#answerSection').hide();
+    $('#showAnswerBtn').removeClass('hidden');
+    $('#nextBtn').addClass('hidden');
+    
+    // Scroll to top
+    $('.question-container').scrollTop(0);
+    
+    // Simulate team scores updating randomly (in real app, this would come from team inputs)
+    updateTeamScores();
+}
+
+function updateTeamScores() {
+    // This is just for demo - in real app, teams would submit answers
+    // Randomly increment scores to show animation
+    if (Math.random() > 0.7) {
+        const team = Math.floor(Math.random() * 4);
+        teamScores[team] += 10;
+        
+        const teamEmojis = ['🔴', '🔵', '🟢', '🟡'];
+        let statsHtml = '';
+        for (let i = 0; i < 4; i++) {
+            statsHtml += `<div class="team-stat"><span>${teamEmojis[i]}</span> ${teamScores[i]}</div>`;
+        }
+        $('#teamStats').html(statsHtml);
+    }
+}
+
+function showTimesUpModal() {
+    clearTimeout(timerTimeout);
+    $('#timesUpModal').fadeIn(300).css('display', 'flex');
+    $('.timer-bar').css('animation-play-state', 'paused');
+}
+
+function showCompleteModal() {
+    $('#completeModal').fadeIn(300).css('display', 'flex');
+}
+
+$('#showAnswerBtn').on('click', function () {
+    $('#answerSection').slideDown(300, function() {
+        $('.question-container').animate({
+            scrollTop: $('.question-container')[0].scrollHeight
+        }, 500);
+    });
+    $(this).addClass('hidden');
+    $('#nextBtn').removeClass('hidden');
+});
+
+$('#nextBtn').on('click', function () {
+    currentIndex++;
+    showQuestion();
+});
+
+// Modal OK buttons
+$('#modalOkBtn').on('click', function() {
+    location.href = 'index.html';
+});
+
+$('#completeOkBtn').on('click', function() {
+    location.href = 'index.html';
+});
+
+window.addEventListener('beforeunload', function() {
+    clearTimeout(timerTimeout);
+});
+</script>
+
+</body>
+</html>
