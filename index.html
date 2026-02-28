@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Scramble Royale</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,6 +14,12 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
         body {
             font-family: 'Bubblegum Sans', cursive;
             min-height: 100vh;
@@ -21,8 +27,8 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            overflow: hidden;
             background: #FFFFFF;
+            padding: 15px;
         }
 
         body::before {
@@ -42,13 +48,16 @@
             text-align: center;
             z-index: 1;
             animation: slideIn 0.8s ease-out;
-            padding-bottom: 100px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px;
         }
 
         @keyframes slideIn {
             from {
                 opacity: 0;
-                transform: translateY(-50px);
+                transform: translateY(-30px);
             }
             to {
                 opacity: 1;
@@ -57,31 +66,23 @@
         }
 
         .logo-container {
-            margin-bottom: 15px;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-20px);
-            }
+            margin-bottom: 10px;
+            /* BOUNCE ANIMATION REMOVED */
         }
 
         .logo {
-            max-width: 800px;
+            max-width: 700px;
             width: 90%;
-            margin-top: 0;
-            
+            margin: 0 auto;
+            filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.15));
+            display: block;
         }
 
         /* ===== LEVEL SELECTOR SECTION ===== */
         .level-selector {
-            margin: 15px auto 30px auto;
+            margin: 10px auto 20px auto;
             display: flex;
-            gap: 30px;
+            gap: 15px;
             justify-content: center;
             flex-wrap: wrap;
             align-items: center;
@@ -90,78 +91,77 @@
 
         .level-btn {
             font-family: 'Fredoka One', cursive;
-            font-size: 20px;
-            padding: 15px 40px;
+            font-size: 18px;
+            padding: 12px 25px;
             border: none;
             border-radius: 50px;
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             text-transform: uppercase;
             letter-spacing: 1px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
             color: white;
             border: 2px solid rgba(255, 255, 255, 0.3);
+            min-width: 160px;
+            white-space: nowrap;
         }
 
         .level-btn.beginner {
-            background: #2e7d32;  /* Dark green */
+            background: #2e7d32;
             border-color: #4CAF50;
         }
         
         .level-btn.intermediate {
-            background: #FFD700;  /* Yellow/Gold */
+            background: #FFD700;
             border-color: #FDB931;
-            color: #333;  /* Darker text for contrast on yellow */
+            color: #333;
         }
         
         .level-btn.advanced {
-            background: #c62828;  /* Dark red */
+            background: #c62828;
             border-color: #f44336;
         }
 
         .level-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
             filter: brightness(1.1);
         }
 
-        /* Selected button - grows larger */
         .level-btn.selected {
-            transform: scale(1.15);
+            transform: scale(1.1);
             border: 3px solid #333;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
             z-index: 10;
             filter: brightness(1.1);
         }
 
-        /* When ANY button is selected, the non-selected ones shrink */
         .level-selector:has(.selected) .level-btn:not(.selected) {
-            transform: scale(0.7);
+            transform: scale(0.8);
             opacity: 0.7;
         }
 
-        /* Ensure hover still works on shrunken buttons */
         .level-selector:has(.selected) .level-btn:not(.selected):hover {
-            transform: scale(0.75);
+            transform: scale(0.85);
             opacity: 0.9;
         }
 
         /* ===== MODE BUTTONS SECTION ===== */
         .mode-buttons {
             display: flex;
-            gap: 40px;
+            gap: 20px;
             max-width: 900px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 0 10px;
             justify-content: center;
             flex-wrap: wrap;
-            margin-top: 10px;
+            margin-top: 5px;
         }
 
         .mode-btn {
             font-family: 'Fredoka One', cursive;
-            font-size: 22px;
-            padding: 30px 40px;
+            font-size: 20px;
+            padding: 20px 30px;
             border: none;
             border-radius: 20px;
             cursor: pointer;
@@ -177,20 +177,20 @@
             justify-content: center;
             color: white;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            flex: 1;
-            min-width: 300px;
-            max-width: 400px;
+            flex: 1 1 auto;
+            min-width: 250px;
+            max-width: 350px;
             line-height: 1.3;
             text-align: center;
         }
 
         .mode-btn.team-mode {
-            background: linear-gradient(145deg, #1A3A5F, #0F2A44);  /* Navy blue gradient */
+            background: linear-gradient(145deg, #1A3A5F, #0F2A44);
             border: 2px solid #2B4F7C;
         }
 
         .mode-btn.battle-mode {
-            background: linear-gradient(145deg, #6B4E9E, #4A2C7A);  /* Purple gradient */
+            background: linear-gradient(145deg, #6B4E9E, #4A2C7A);
             border: 2px solid #8A6CC7;
         }
 
@@ -202,7 +202,7 @@
             width: 0;
             height: 0;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.2);
             transform: translate(-50%, -50%);
             transition: width 0.6s, height 0.6s;
         }
@@ -213,18 +213,18 @@
         }
 
         .mode-btn:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
             filter: brightness(1.1);
         }
 
         .mode-btn:active {
-            transform: translateY(-2px) scale(1.02);
+            transform: translateY(0) scale(0.98);
         }
 
         .mode-icon {
-            font-size: 32px;
-            margin-right: 15px;
+            font-size: 28px;
+            margin-right: 12px;
             filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
         }
 
@@ -233,6 +233,7 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
+            display: none; /* Hidden on mobile for performance */
         }
 
         .sparkle span {
@@ -251,7 +252,7 @@
                 transform: translateY(0) rotate(0deg);
             }
             50% {
-                opacity: 0.8;
+                opacity: 0.5;
             }
             100% {
                 opacity: 0;
@@ -259,65 +260,176 @@
             }
         }
 
-        .sparkle span:nth-child(1) { left: 10%; animation-delay: 0s; }
-        .sparkle span:nth-child(2) { left: 25%; animation-delay: 0.5s; }
-        .sparkle span:nth-child(3) { left: 40%; animation-delay: 1s; }
-        .sparkle span:nth-child(4) { left: 55%; animation-delay: 1.5s; }
-        .sparkle span:nth-child(5) { left: 70%; animation-delay: 0.3s; }
-        .sparkle span:nth-child(6) { left: 85%; animation-delay: 0.8s; }
-        .sparkle span:nth-child(7) { left: 90%; animation-delay: 1.3s; }
-
         .tagline {
-            font-size: 24px;
+            font-size: 22px;
             color: #666;
-            margin-top: 20px;
-            margin-bottom: 20px;
+            margin: 15px 0;
             font-family: 'Fredoka One', cursive;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
             letter-spacing: 2px;
         }
 
-        @media (max-width: 768px) {
-            .mode-buttons {
-                flex-direction: column;
-                gap: 25px;
-                align-items: center;
-            }
-
-            .mode-btn {
-                font-size: 20px;
-                padding: 25px 30px;
-                min-width: 280px;
-                width: 100%;
+        /* ===== TABLET & MOBILE OPTIMIZATIONS ===== */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 5px;
             }
             
-            .level-selector {
-                flex-direction: column;
-                gap: 15px;
+            .logo {
+                max-width: 600px;
+                width: 85%;
             }
             
             .level-btn {
-                width: 250px;
+                font-size: 16px;
+                padding: 10px 20px;
+                min-width: 140px;
+            }
+            
+            .mode-btn {
                 font-size: 18px;
-                padding: 12px 30px;
+                padding: 18px 25px;
+                min-width: 220px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                align-items: flex-start;
+                padding-top: 30px;
             }
             
-            .level-btn.selected {
-                transform: scale(1.1);
+            .container {
+                padding: 5px;
             }
             
-            .level-selector:has(.selected) .level-btn:not(.selected) {
-                transform: scale(0.8);
+            .logo {
+                max-width: 500px;
+                width: 80%;
+                margin-bottom: 5px;
             }
             
             .tagline {
                 font-size: 18px;
+                margin: 10px 0;
+            }
+            
+            .level-selector {
+                flex-direction: column;
+                gap: 10px;
+                margin: 5px auto 15px auto;
+            }
+            
+            .level-btn {
+                width: 250px;
+                font-size: 16px;
+                padding: 12px 20px;
+                white-space: normal;
+            }
+            
+            .level-btn.selected {
+                transform: scale(1.05);
+            }
+            
+            .level-selector:has(.selected) .level-btn:not(.selected) {
+                transform: scale(0.9);
+            }
+            
+            .mode-buttons {
+                flex-direction: column;
+                gap: 15px;
+                align-items: center;
+            }
+            
+            .mode-btn {
+                font-size: 18px;
+                padding: 18px 20px;
+                min-width: 280px;
+                width: 100%;
+                max-width: 320px;
+            }
+            
+            .mode-icon {
+                font-size: 24px;
+                margin-right: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo {
+                max-width: 400px;
+                width: 95%;
+            }
+            
+            .tagline {
+                font-size: 16px;
+            }
+            
+            .level-btn {
+                width: 220px;
+                font-size: 14px;
+                padding: 10px 15px;
+            }
+            
+            .mode-btn {
+                font-size: 16px;
+                padding: 15px 15px;
+                min-width: 240px;
+            }
+            
+            .mode-icon {
+                font-size: 22px;
+                margin-right: 8px;
+            }
+        }
+
+        /* Landscape orientation on tablets */
+        @media (max-height: 600px) and (orientation: landscape) {
+            body {
+                align-items: center;
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 5px;
+            }
+            
+            .logo {
+                max-width: 400px;
+                width: 60%;
+            }
+            
+            .tagline {
+                margin: 5px 0;
+                font-size: 16px;
+            }
+            
+            .level-selector {
+                flex-direction: row;
+                margin: 5px auto;
+            }
+            
+            .level-btn {
+                padding: 8px 15px;
+                font-size: 14px;
+                min-width: 120px;
+            }
+            
+            .mode-buttons {
+                flex-direction: row;
+            }
+            
+            .mode-btn {
+                padding: 12px 15px;
+                font-size: 14px;
+                min-width: 180px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="sparkle">
+    <!-- Sparkle effect - hidden on mobile for performance -->
+    <div class="sparkle" id="sparkleEffect">
         <span></span>
         <span></span>
         <span></span>
@@ -341,13 +453,13 @@
             <button class="level-btn advanced" id="advancedBtn">⚡ ADVANCED</button>
         </div>
 
-        <!-- TWO GAME MODE BUTTONS - UPDATED COLORS -->
+        <!-- TWO GAME MODE BUTTONS -->
         <div class="mode-buttons">
             <a href="mode1.html" class="mode-btn team-mode" id="teamBattleLink">
                 <span class="mode-icon">🎯</span>
                 Round 1:<br>Team Battle
             </a>
-            <a href="ultimate-battle.html" class="mode-btn battle-mode" id="ultimateBattleLink">
+            <a href="mode2.html" class="mode-btn battle-mode" id="ultimateBattleLink">
                 <span class="mode-icon">👑</span>
                 Round 2:<br>Ultimate Battle
             </a>
@@ -423,6 +535,11 @@
                 alert('⚠️ Please select a difficulty level first!');
             }
         });
+
+        // Disable sparkle on mobile for better performance
+        if (window.innerWidth <= 768) {
+            document.getElementById('sparkleEffect').style.display = 'none';
+        }
     </script>
 </body>
 </html>
